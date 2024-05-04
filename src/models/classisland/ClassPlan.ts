@@ -1,5 +1,5 @@
 export class ClassInfo {
-    ClassId: string = "";
+    SubjectId: string = "";
 }
 
 export class TimeRule {

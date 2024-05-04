@@ -3,7 +3,7 @@ import { Subject } from "./models/classisland/Subject";
 import { TimeLayout } from "./models/classisland/TimeLayout";
 import { TimeLayoutItem } from "./models/classisland/TimeLayoutItem";
 import { Profile } from "./models/classisland/Profile";
-import { ClassPlan } from "./models/classisland/ClassPlan";
+import { ClassInfo, ClassPlan } from "./models/classisland/ClassPlan";
 
 interface TimeSpan {
     start: Date;
@@ -29,15 +29,15 @@ function matchTimeSpan(s: string): TimeSpan {
         throw new Error("无效的时间格式：" + s);
     }
     const start = new Date();
-    start.setHours(+nums[0]);
-    start.setMinutes(+nums[1]);
-    start.setSeconds(0);
-    start.setMilliseconds(0);
+    start.setUTCHours(+nums[0]);
+    start.setUTCMinutes(+nums[1]);
+    start.setUTCSeconds(0);
+    start.setUTCMilliseconds(0);
     const end = new Date();
-    end.setHours(+nums[1]);
-    end.setMinutes(+nums[2]);
-    end.setSeconds(0);
-    end.setMilliseconds(0);
+    end.setUTCHours(+nums[2]);
+    end.setUTCMinutes(+nums[3]);
+    end.setUTCSeconds(0);
+    end.setUTCMilliseconds(0);
     return {
         start: start,
         end: end
@@ -48,11 +48,10 @@ export function convertEcsToClassIsland(profile: Schedule): Profile {
     const classIsland = new Profile();
     const subjectMapping = new Map<string, string>();
     const timeTableMapping = new Map<string, string>();
-    const timeTableMappingReversed = new Map<string, string>();
     // 处理科目
     profile.subject_name.forEach((v, k) => {
         const guid = generateGuid();
-        subjectMapping.set(guid, k);
+        subjectMapping.set(k, guid);
         classIsland.Subjects.set(guid, {
             Name: v,
             Initial: k,
@@ -63,17 +62,18 @@ export function convertEcsToClassIsland(profile: Schedule): Profile {
     // 处理时间表
     profile.timetable.forEach((v, k) => {
         const guid = generateGuid();
-        timeTableMapping.set(guid, k);
-        timeTableMappingReversed.set(k, guid);
+        timeTableMapping.set(k, guid);
         const tl = new TimeLayout();
         if (v.size <= 0) {
             return;
         } 
+        tl.Name = k;
         let last: TimeLayoutItem | undefined;
         const dividers = profile.divider.get(k);
         v.forEach((v, k) => {
             const tp = new TimeLayoutItem();
             const ts = matchTimeSpan(k);
+            console.debug("匹配时间段：", ts);
             tp.StartSecond = ts.start;
             tp.EndSecond = ts.end;
             if (last != undefined) {
@@ -85,16 +85,24 @@ export function convertEcsToClassIsland(profile: Schedule): Profile {
             last = tp
             tl.Layouts.push(tp);
             if (typeof(v) == "number" && dividers != undefined && dividers.includes(v as number)) {
-                const startDivider = new Date(ts.end.getUTCSeconds() + 120);
+                const startDivider = new Date(ts.end.getTime() + 120);
                 const tpd = new TimeLayoutItem();
                 tpd.StartSecond = tpd.EndSecond = startDivider;
                 tpd.TimeType = 2;
                 tl.Layouts.push(tpd)
             }
         });
+        const first = tl.Layouts[0];
+        const end = tl.Layouts[tl.Layouts.length - 1];
+        if (first.StartSecond.getUTCHours() == 0 && first.StartSecond.getUTCMinutes() == 0) {
+            tl.Layouts.shift();
+        }
+        if (end != undefined && end.EndSecond.getUTCHours() == 23 && end.EndSecond.getUTCMinutes() == 59) {
+            tl.Layouts.pop();
+        }
         tl.Layouts.sort((x, y) => {
             return x.StartSecond.getUTCSeconds() - y.EndSecond.getUTCSeconds();
-        })
+        });
         classIsland.TimeLayouts.set(guid, tl);
     })
 
@@ -106,7 +114,7 @@ export function convertEcsToClassIsland(profile: Schedule): Profile {
         const timeTable = v.timetable;
         console.log(timeTable, v);
 
-        const timeLayoutId = timeTableMappingReversed.get(v.timetable);
+        const timeLayoutId = timeTableMapping.get(v.timetable);
         if (timeLayoutId == undefined)
             return;
         cp1.Name = cp2.Name = v.Chinese + v.English;
@@ -115,11 +123,12 @@ export function convertEcsToClassIsland(profile: Schedule): Profile {
         v.classList.forEach((v) => {
             if (typeof(v) == "string") {
                 const subjectId = subjectMapping.get(v);
+
                 cp1.Classes.push({
-                    ClassId: subjectId == undefined ? "" : subjectId
+                    SubjectId: subjectId == undefined ? "" : subjectId
                 });
                 cp2.Classes.push({
-                    ClassId: subjectId == undefined ? "" : subjectId
+                    SubjectId: subjectId == undefined ? "" : subjectId
                 });
                 
             } else {
@@ -127,10 +136,10 @@ export function convertEcsToClassIsland(profile: Schedule): Profile {
                 const subjectId1 = subjectMapping.get(v[0]);
                 const subjectId2 = v.length >= 1 ? subjectMapping.get(v[1]) : undefined;
                 cp1.Classes.push({
-                    ClassId: subjectId1 == undefined ? "" : subjectId1
+                    SubjectId: subjectId1 == undefined ? "" : subjectId1
                 });
                 cp2.Classes.push({
-                    ClassId: subjectId2 == undefined ? "" : subjectId2
+                    SubjectId: subjectId2 == undefined ? "" : subjectId2
                 });
             }
         });

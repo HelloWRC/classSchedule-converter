@@ -1,6 +1,6 @@
 import { Schedule } from "../models/ecs/Schedule";
 
-export function loadEcsSchedul(configJs: string): Schedule {
+export function loadEcsSchedule(configJs: string): Schedule {
     const r = Function(configJs)() as Schedule;
     console.log(r);
     r.subject_name = new Map<string, string>(Object.entries(r.subject_name));
