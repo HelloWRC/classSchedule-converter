@@ -1,8 +1,10 @@
 import { Button, Card, Combobox, Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, DialogTrigger, Option } from '@fluentui/react-components'
 import './App.css'
 import { useState } from 'react';
+import { Schedule } from './models/ecs/Schedule';
+import { convertEcsToClassIsland } from './converting';
+import { loadEcsSchedul } from './utils/scheduleLoader';
 
-const convertTargets = ["ClassIsland", "ElectronClassSchedule"];
 
 function App() {
   const [dialogOpen, setDialogOpen] = useState<boolean>(false); 
@@ -95,8 +97,9 @@ function App() {
   }
 
   function loadConfig(js: string) {
-    const r = Function(js)();
-    console.log(r);
+    const r = loadEcsSchedul(js);
+    const ci = convertEcsToClassIsland(r);
+    console.log(ci);
   }
 }
 
