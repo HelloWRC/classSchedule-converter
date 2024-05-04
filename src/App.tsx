@@ -1,35 +1,104 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { Button, Card, Combobox, Dialog, DialogActions, DialogBody, DialogContent, DialogSurface, DialogTitle, DialogTrigger, Option } from '@fluentui/react-components'
 import './App.css'
+import { useState } from 'react';
+
+const convertTargets = ["ClassIsland", "ElectronClassSchedule"];
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [dialogOpen, setDialogOpen] = useState<boolean>(false); 
+  const [dialogHeader, setdialogHeader] = useState<string>(""); 
+  const [dialogContent, setdialogContent] = useState<string>(""); 
+  const [configRaw, setConfigRaw] = useState<string>("");
+
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div id="app-container-main">
+        <div id="app-appbar-container">
+          <div id="app-appbar">
+            <p>ClassSchedule Converter</p>
+          </div>
+
+        </div>
+        <div id="app-main">
+          <Card>
+            <h2>课表格式转换工具</h2>
+            <div id="app-translation-direction">
+              <p>
+                ElectronClassSchedule ➡ ClassIsland
+              </p>
+            </div>
+            <Button onClick={uploadFile}>上传文件</Button>
+            <input type="file" id="file-import-internal" onChange={fileSelected}/>
+          </Card>
+        </div>
+
+        
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <Dialog open={dialogOpen}
+              onOpenChange={(event, data) => {
+                // it is the users responsibility to react accordingly to the open state change
+                setDialogOpen(data.open);
+              }}>
+        <DialogSurface>
+          <DialogBody>
+            <DialogTitle>{dialogHeader}</DialogTitle>
+            <DialogContent>
+              {dialogContent}
+            </DialogContent>
+            <DialogActions>
+            <DialogTrigger disableButtonEnhancement>    
+              <Button appearance="primary">确定</Button>
+            </DialogTrigger>
+            </DialogActions>
+          </DialogBody>
+        </DialogSurface>
+      </Dialog>
     </>
   )
+
+  function onDialogOpenChanged() {
+    
+  }
+
+  function uploadFile() {
+    const input = document.getElementById("file-import-internal") as HTMLInputElement;
+    if (input == null)
+      return;
+    input.value = "";
+    input.click();
+  }
+
+  function showDialog(title:string, content:string) {
+    setdialogHeader(title);
+    setdialogContent(content);
+    setDialogOpen(true);
+  }
+  
+  function fileSelected() {
+    const input = document.getElementById("file-import-internal") as HTMLInputElement;
+    const files = input.files?.item(0);
+    if (files == null) {
+      return;
+    }
+    console.log("选择文件", files);
+    if (!files.name.endsWith(".js")) {
+      showDialog("无法加载文件", "请选择正确格式的文件。");
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      console.log(reader.result);
+      setConfigRaw(reader.result as string);
+      loadConfig(configRaw + "\nreturn scheduleConfig;");
+    };
+    reader.readAsText(files);
+  }
+
+  function loadConfig(js: string) {
+    const r = Function(js)();
+    console.log(r);
+  }
 }
+
 
 export default App
