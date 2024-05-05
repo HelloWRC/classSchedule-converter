@@ -9,7 +9,7 @@
 
 #app-main {
   position: relative;
-  max-width: 1000px;
+  /* max-width: 1000px; */
   width: auto;
   display: flex;
 }
@@ -32,10 +32,11 @@
 }
 
 .app-shcedule-panel {
-  flex-grow: 1;
+  flex: 1;
   margin: 4px;
   margin-top: 16px;
-  display: flex;
+  /* display: flex; */
+  flex-direction: column;
 }
 
 .app-stretched {
@@ -44,14 +45,43 @@
 
 .app-container {
   padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-items: start;
+
+  > * {
+    margin-top: 8px;
+  }
+
+  Button {
+    margin-right: 4px;
+  }
 }
 
 .hidden {
   display: none;
 }
 
+#form-target-format, #form-source-format {
+  margin-top: 16px;
+}
+
 #idle-tip {
   align-self: center;
   width: 100%;
   text-align: center;
+}
+
+@media screen and (max-width: 800px) {
+  #app-main {
+    flex-direction: column;
+  }
+
+  .app-shcedule-panel {
+    margin: 8px;
+  }
+}
+
+#app-title {
+  flex-grow: 1;
 }

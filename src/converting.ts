@@ -1,9 +1,8 @@
 import { Schedule } from "./models/ecs/Schedule";
-import { Subject } from "./models/classisland/Subject";
 import { TimeLayout } from "./models/classisland/TimeLayout";
 import { TimeLayoutItem } from "./models/classisland/TimeLayoutItem";
 import { Profile } from "./models/classisland/Profile";
-import { ClassInfo, ClassPlan } from "./models/classisland/ClassPlan";
+import { ClassPlan } from "./models/classisland/ClassPlan";
 
 interface TimeSpan {
     start: Date;

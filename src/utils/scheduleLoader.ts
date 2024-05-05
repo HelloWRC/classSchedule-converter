@@ -1,7 +1,7 @@
 import { Schedule } from "../models/ecs/Schedule";
 
 export function loadEcsSchedule(configJs: string): Schedule {
-    const r = Function(configJs)() as Schedule;
+    const r = Function(configJs + "\nreturn scheduleConfig")() as Schedule;
     console.log(r);
     r.subject_name = new Map<string, string>(Object.entries(r.subject_name));
     r.divider = new Map<string, Array<number>>(Object.entries(r.divider));
