@@ -4,9 +4,10 @@ import { convertEcsToClassIsland } from './converting';
 import { loadEcsSchedule } from './utils/scheduleLoader';
 import { AppBar, Toolbar, Typography, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Select, MenuItem, InputLabel, FormControl, Alert, useMediaQuery } from '@mui/material';
 import { saveClassIslandProfile } from './utils/classIslandLoader';
-import TextField from '@material-ui/core/TextField';
+import TextField from '@mui/material/TextField';
 import React from 'react';
-import { createTheme, ThemeProvider } from '@material-ui/core/styles';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 
 const convertingOptions = ["ClassIsland", "ElectronClassSchedule"]
 
@@ -17,7 +18,7 @@ function App() {
     () =>
       createTheme({
         palette: {
-          type: prefersDarkMode ? 'dark' : 'light'
+          mode: prefersDarkMode ? 'dark' : 'light'
         }
       }),
     [prefersDarkMode],
@@ -62,6 +63,7 @@ function App() {
   return (
     <>
     <ThemeProvider theme={theme}>
+      <CssBaseline />
       <div id="app-container-main">
         <input
           accept="text/javascript"
