@@ -2,10 +2,9 @@ import './App.css'
 import { useState } from 'react';
 import { convertEcsToClassIsland } from './converting';
 import { loadEcsSchedule } from './utils/scheduleLoader';
-import { AppBar, Toolbar, Typography, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Select, MenuItem, InputLabel, FormControl, Alert, IconButton, useMediaQuery } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Paper, Select, MenuItem, InputLabel, FormControl, Alert, useMediaQuery } from '@mui/material';
 import { saveClassIslandProfile } from './utils/classIslandLoader';
 import TextField from '@material-ui/core/TextField';
-import GitHubIcon from '@material-ui/icons/GitHub';
 import React from 'react';
 import { createTheme, ThemeProvider } from '@material-ui/core/styles';
 
@@ -78,9 +77,10 @@ function App() {
               课表转换工具
             </Typography>
             <Toolbar>
-              <IconButton color="inherit" edge="end" href="https://github.com/HelloWRC/classSchedule-converter">
-                <GitHubIcon />
-              </IconButton>
+              <Button color="inherit"
+              href="https://github.com/HelloWRC/classSchedule-converter">
+                GitHub
+              </Button>
             </Toolbar>
           </Toolbar>
         </AppBar>
