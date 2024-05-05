@@ -14,6 +14,7 @@ jobs:
       - name: Install and Build
         run: |
           export CI=false
+          rm package-lock.json
           npm install
           npm run build
       - name: Archive artifact
